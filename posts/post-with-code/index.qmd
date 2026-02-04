@@ -6,8 +6,102 @@ categories: [news, code, analysis]
 image: "image.jpg"
 ---
 
-This is a post with executable code.
+
+
+I am looking at a data set involving the St. Lawrence baseball team. Specifically within the team, I am looking at both hitters and pitchers. I am looking into how the more games you play or innings you pitch have correlation to being a better player as your coach trusts you to throw more. Within the data set, after manipulation, there are 30 observations between two data sets. My question of interest is as you play more games,is there a clear distinction that you are the better player. Also, a player with a high average, do they also produce a high on base percentage, and are there any outliers within that as well. 
+
 
 ```{r}
-1 + 1
+library(tidyverse)
+library(rvest)
+
+url <- "https://saintsathletics.com/sports/baseball/stats/2024"
+
+slu <- read_html(url)
+table <- slu %>% html_nodes("table")
+
+object <- table %>% html_table()
+
+batting <- object[[1]]
+
+pitching <- object[[2]]
 ```
+
+
+
+
+```{r}
+slu_batting <- batting |>
+   separate_wider_delim(cols = `GP-GS`,
+                       names = c("GP", "GS"),
+                       delim = "-") |>
+  slice(1:18) |>
+  filter(AVG != .250)
+```
+
+
+```{r}
+slu_pitching <- pitching |>
+  separate_wider_delim(cols = `APP-GS`,
+                       names = c("APP", "GS"),
+                       delim = "-") |>
+  slice(1:16) |>
+  filter(ERA > 0) |>
+  arrange(ERA)
+```
+
+
+```{r}
+top11_bat <- slu_batting |> 
+  slice(1:11)
+ggplot(top11_bat, aes(x = `#`, y = `OB%`, fill = AVG)) +
+  geom_col()
+```
+
+
+
+
+```{r}
+ggplot(slu_batting, aes(x = `OB%`, y = GP)) +
+  geom_point()
+```
+
+```{r}
+ggplot(slu_pitching, aes(x = IP, y = ERA)) +
+  geom_point()
+```
+
+
+```{r}
+top8_pitch <- slu_pitching |>
+  slice(1:8)
+ggplot(top8_pitch, aes(x = `#`, y = H, fill = SO)) +
+  geom_col()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
