@@ -1,0 +1,83 @@
+---
+title: "Blog Post 2"
+author: "Boden Driscoll"
+date: "2026-2-18"
+categories: [news, code, analysis]
+---
+
+```{r}
+library(nflreadr)
+library(tidyverse)
+offensive_stats <- nflreadr::load_player_stats(2025)
+```
+
+
+
+```{r}
+pats_receiving <- offensive_stats |>
+  filter(team == "NE") |>
+  filter(position %in% c("WR","TE","RB")) |>
+   group_by(position) |>
+  summarise(avg_yards = mean(receiving_yards),
+              se = sd(receiving_yards) / sqrt(n())) |>
+  mutate(se_lb = avg_yards - se,
+         se_ub = avg_yards + se) |>
+  mutate(position = fct_reorder(position, avg_yards))
+
+ggplot(data = pats_receiving, aes(x = position, y = avg_yards)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = se_lb, ymax = se_ub)) +
+   theme_minimal() +
+  coord_flip()
+```
+
+
+```{r}
+pats_receiving_players <- offensive_stats |>
+  filter(team == "NE") |>
+   filter(position %in% c("WR","TE","RB")) |>
+  group_by(player_display_name) |>
+    summarise(avg_yards = mean(receiving_yards),
+              se = sd(receiving_yards) / sqrt(n())) |>
+  mutate(se_lb = avg_yards - se,
+         se_ub = avg_yards + se) |>
+  mutate(position = fct_reorder(player_display_name, avg_yards))
+
+ggplot(data = pats_receiving_players, aes(x = player_display_name, y = avg_yards)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = se_lb, ymax = se_ub)) +
+   theme_minimal() +
+  coord_flip()
+
+```
+
+
+
+
+```{r}
+QB_info <- offensive_stats |>
+  filter(position == "QB") |>
+  group_by(player_display_name) |>
+  summarise(avg_yards = mean(passing_yards),
+              se = sd(passing_yards) / sqrt(n())) |>
+  mutate(se_lb = avg_yards - se,
+         se_ub = avg_yards + se) |>
+  filter(avg_yards >= 150) |>
+  mutate(player_display_name = fct_reorder(player_display_name, avg_yards))
+
+ggplot(data = QB_info, aes(x = player_display_name, y = avg_yards)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = se_lb, ymax = se_ub)) +
+   theme_minimal() +
+  coord_flip()
+```
+
+
+
+
+
+
+
+
+
+
