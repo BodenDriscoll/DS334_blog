@@ -5,12 +5,7 @@ date: "2026-02-04"
 categories: [news, code, analysis]
 ---
 
-
-
-I am looking at a data set involving the St. Lawrence baseball team. It has data stemming from 2024 for both pitchers and hitters. There are two separate datasets, one for hitters and pitchers, total there are 30 observations. I am looking to see how players who play more games produce compared to those who don't play as much. Are there certain players who aren't playing as much and are overachieving? The variables I am most interested in are on base percentage, average, era, and total games played specifically. The data came directly from the St Lawrence website and was put into a table format. Some important things to note are that I scraped the data to remove certain people who may have played an extremely small amount of games. This is to ensure accurate data of people who played at least a decent amount of games in the 2024 season. 
-link:
-https://saintsathletics.com/sports/baseball/stats/2024
-
+I am looking at a data set involving the St. Lawrence baseball team. It has data stemming from 2024 for both pitchers and hitters. There are two separate datasets, one for hitters and pitchers, total there are 30 observations. I am looking to see how players who play more games produce compared to those who don't play as much. Are there certain players who aren't playing as much and are overachieving? The variables I am most interested in are on base percentage, average, era, and total games played specifically. The data came directly from the St Lawrence website and was put into a table format. Some important things to note are that I scraped the data to remove certain people who may have played an extremely small amount of games. This is to ensure accurate data of people who played at least a decent amount of games in the 2024 season. link: https://saintsathletics.com/sports/baseball/stats/2024
 
 ```{r}
 library(tidyverse)
@@ -28,8 +23,6 @@ batting <- object[[1]]
 pitching <- object[[2]]
 ```
 
-
-
 ```{r}
 slu_batting <- batting |>
    separate_wider_delim(cols = `GP-GS`,
@@ -44,7 +37,6 @@ slu_batting <- batting |>
   slice(1:18) |>
   filter(AVG != .250)
 ```
-
 
 ```{r}
 slu_pitching <- pitching |>
@@ -62,8 +54,6 @@ slu_pitching <- pitching |>
   arrange(ERA)
 ```
 
-
-
 ```{r}
 ggplot(slu_batting, aes(x = `OB%`, y = GP)) +
   geom_point(color = "red") +
@@ -71,10 +61,7 @@ ggplot(slu_batting, aes(x = `OB%`, y = GP)) +
   labs(title = "Comparing Games Played to On Base Percentage")
 ```
 
-
-Based on the graph, as games played goes up, typically on base percentage is higher. This makes sense as the people who play more games are typically the best players and should have higher on base percentages. There is one clear outlier with an on base percentage around 0.46 and only 10 games played. That person would be somebody that should probably be playing more. 
-
-
+Based on the graph, as games played goes up, typically on base percentage is higher. This makes sense as the people who play more games are typically the best players and should have higher on base percentages. There is one clear outlier with an on base percentage around 0.46 and only 10 games played. That person would be somebody that should probably be playing more.
 
 ```{r}
 top11_bat <- slu_batting |> 
@@ -86,8 +73,7 @@ ggplot(top11_bat, aes(x = Name, y = `OB%`, fill = AVG)) +
   labs(title = "Top 10 Hitters On Base Percentage Compared to their Average")
 ```
 
-This data is displaying the top 10 averages on the St. Lawrence baseball team from 2024. On the bottom, displaying the names of the players with the y-axis displaying the on base percentage. The fill color showing the players average based on the scale. This graph indicates players who one, have a high on base percentage while also having a high average. Indicating a very good bat to ball player. While also displaying people who may have a high on base percentage but a very low average. For example, Connor has the best on base percentage while also have an average around 0.35. However, Morrisey has an impressive on base percentage just below while having a higher average than Connor. On the other end, Donnellan has an on base percentage in the top 10, however a significantly lower average around 0.20. This graph indicates players specifically and can compare them easily based on on base percentage. 
-
+This data is displaying the top 10 averages on the St. Lawrence baseball team from 2024. On the bottom, displaying the names of the players with the y-axis displaying the on base percentage. The fill color showing the players average based on the scale. This graph indicates players who one, have a high on base percentage while also having a high average. Indicating a very good bat to ball player. While also displaying people who may have a high on base percentage but a very low average. For example, Connor has the best on base percentage while also have an average around 0.35. However, Morrisey has an impressive on base percentage just below while having a higher average than Connor. On the other end, Donnellan has an on base percentage in the top 10, however a significantly lower average around 0.20. This graph indicates players specifically and can compare them easily based on on base percentage.
 
 ```{r}
 ggplot(slu_pitching, aes(x = IP, y = ERA)) +
@@ -96,9 +82,7 @@ ggplot(slu_pitching, aes(x = IP, y = ERA)) +
   labs(title = "Innings Pitched versus On Base Percentage in Pitchers")
 ```
 
-
-Displaying inning pitched compared to ERA clearly shows a downward trend, as innings pitched increases, ERA decreases. This makes sense as the more innings your coach trusts you to pitch, typically means you are a better pitcher. There is a certain player with the lowest ERA who has only thrown about 22 innings, that player should probably get more innings as they had the lowest ERA in this graph. 
-
+Displaying inning pitched compared to ERA clearly shows a downward trend, as innings pitched increases, ERA decreases. This makes sense as the more innings your coach trusts you to pitch, typically means you are a better pitcher. There is a certain player with the lowest ERA who has only thrown about 22 innings, that player should probably get more innings as they had the lowest ERA in this graph.
 
 ```{r}
 top10_pitch <- slu_pitching |>
@@ -111,24 +95,10 @@ ggplot(top10_pitch, aes(x = Name, y = H, fill = SO)) +
   labs(title = "Comparing the Number of Hits allowed with Strikeout Totals")
 ```
 
+This graph displays the top 10 pitchers based on ERA for the St Lawrence baseball team. Showing the number of hits they allowed with the fill being the number of strikeouts they have had. Obviously, having a low number of hits while also having a high number of strikeouts is the most beneficial. In the graph, Hutchins has some of the most hits, however, clearly has the most strikeouts at the same time. Compared to O'neil who has noticeably lower strikeouts than Hutchins but with the same number of hits. In this graph, nobody noticeably stands out as much as Hutchins who has a massive amount of strikeouts compared to the rest of the players.
 
-  This graph displays the top 10 pitchers based on ERA for the St Lawrence baseball team. Showing the number of hits they allowed with the fill being the number of strikeouts they have had. Obviously, having a low number of hits while also having a high number of strikeouts is the most beneficial. In the graph, Hutchins has some of the most hits, however, clearly has the most strikeouts at the same time. Compared to O'neil who has noticeably lower strikeouts than Hutchins but with the same number of hits. In this graph, nobody noticeably stands out as much as Hutchins who has a massive amount of strikeouts compared to the rest of the players.
-
-  Some flaws from my data could be that from graph to graph it is sometime difficult to determine some key factors. In the hitters graphs, on base percentage and games played clearly have correlation. However, somebody with a lower on base percentage may be essential to have in the field because of their defense, but that is impossible to display with the information I have. In the pitchers data, specifically the bar chart it is easy to see hits and strikeouts and that is something interesting to compare. However, it does not display anything about innings pitched or batters faced. Meaning Hutchins could have just faced far more hitters than the other pitchers but looks worse do to having way more hits allowed which is exactly what has happened here. 
+Some flaws from my data could be that from graph to graph it is sometime difficult to determine some key factors. In the hitters graphs, on base percentage and games played clearly have correlation. However, somebody with a lower on base percentage may be essential to have in the field because of their defense, but that is impossible to display with the information I have. In the pitchers data, specifically the bar chart it is easy to see hits and strikeouts and that is something interesting to compare. However, it does not display anything about innings pitched or batters faced. Meaning Hutchins could have just faced far more hitters than the other pitchers but looks worse do to having way more hits allowed which is exactly what has happened here.
 
 If I had more time, I would have liked to look into the players that seem to be out performing. The players that don't have a lot of games but are performing well. I would like to see what grade they are and if there is trend in that. Are players who are performing well but not getting the playing time typically underclassmen?
 
-  My visualizations have connected ideas from class by displaying information in these bar charts. The line plots do not relate as well because they are more basic but they carry important information that is used in the next plot. The maps allow people to directly compare players and see who is, one, performing better than the rest. And secondly, and I would argue more important, what players are performing well that are not playing as much. This is piece where it may be difficult to see in a coaches view, but when looking at the information, it is easy to see how some people are out performing their peers. This is the essential idea of visualization. Displaying information to people to make certain ideas more clear to the human mind. These graphs allow you to see outliers of people who may be performing well and should play more. Or other people who are playing significantly but aren't performing. 
-
-
-
-
-
-
-
-
-
-
-
-
-
+My visualizations have connected ideas from class by displaying information in these bar charts. The line plots do not relate as well because they are more basic but they carry important information that is used in the next plot. The maps allow people to directly compare players and see who is, one, performing better than the rest. And secondly, and I would argue more important, what players are performing well that are not playing as much. This is piece where it may be difficult to see in a coaches view, but when looking at the information, it is easy to see how some people are out performing their peers. This is the essential idea of visualization. Displaying information to people to make certain ideas more clear to the human mind. These graphs allow you to see outliers of people who may be performing well and should play more. Or other people who are playing significantly but aren't performing.

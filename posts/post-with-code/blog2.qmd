@@ -5,11 +5,7 @@ date: "2026-2-18"
 categories: [news, code, analysis]
 ---
 
-
 I am working with an NFL data set that gives information regarding offensive players in the NFL. I am looking into specifically the New England Patriots. Exploring their leading receiving positions along with their specific leading receivers. Following that, I also looked into passing yard leaders for the entire NFL, based on average passing yards per game. In the quarterback data set there is 43 observations, only 3 in the first NE data set and 10 observations for total receivers for the patriots receivers. My question of interest is what position has the most receivers yards for the patriots, following that, what players have the most receiving yards. Then what quarterbacks throw for the most yards per game, is there anything that stands out. The data came from an online source that gave me the R package. It is just an R package that can be installed (library(nflreadr). This data is from the 2025 NFL season and contains all Patriot games, including the postseason.
-
-
-
 
 
 ```{r}
