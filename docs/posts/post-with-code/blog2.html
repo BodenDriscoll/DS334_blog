@@ -190,6 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<p>I am working with an NFL data set that gives information regarding offensive players in the NFL. I am looking into specifically the New England Patriots. Exploring their leading receiving positions along with their specific leading receivers. Following that, I also looked into passing yard leaders for the entire NFL, based on average passing yards per game. In the quarterback data set there is 43 observations, only 3 in the first NE data set and 10 observations for total receivers for the patriots receivers. My question of interest is what position has the most receivers yards for the patriots, following that, what players have the most receiving yards. Then what quarterbacks throw for the most yards per game, is there anything that stands out. The data came from an online source that gave me the R package. It is just an R package that can be installed (library(nflreadr). This data is from the 2025 NFL season and contains all Patriot games, including the postseason.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nflreadr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -228,7 +229,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> se_lb, <span class="at">ymax =</span> se_ub)) <span class="sc">+</span></span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Average Yards"</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Average Yards per game by position for the New England Patriots"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -237,6 +240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>The data displays the average receiving yards per game by each position on the New England Patriots. It is clear that receivers had the most average yards per game, however, the tight ends were far closer than expected. This is probably one of the closest differences between tight ends and receivers in the NFL.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pats_receiving_players <span class="ot">&lt;-</span> offensive_stats <span class="sc">|&gt;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(team <span class="sc">==</span> <span class="st">"NE"</span>) <span class="sc">|&gt;</span></span>
@@ -244,15 +248,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(player_display_name) <span class="sc">|&gt;</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">avg_yards =</span> <span class="fu">mean</span>(receiving_yards),</span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">se =</span> <span class="fu">sd</span>(receiving_yards) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">n</span>())) <span class="sc">|&gt;</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">se_lb =</span> avg_yards <span class="sc">-</span> se,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">se_ub =</span> avg_yards <span class="sc">+</span> se) <span class="sc">|&gt;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">position =</span> <span class="fu">fct_reorder</span>(player_display_name, avg_yards))</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> pats_receiving_players, <span class="fu">aes</span>(<span class="at">x =</span> player_display_name, <span class="at">y =</span> avg_yards)) <span class="sc">+</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> se_lb, <span class="at">ymax =</span> se_ub)) <span class="sc">+</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(avg_yards <span class="sc">&gt;=</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">se_lb =</span> avg_yards <span class="sc">-</span> se,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">se_ub =</span> avg_yards <span class="sc">+</span> se) <span class="sc">|&gt;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">position =</span> <span class="fu">fct_reorder</span>(player_display_name, avg_yards))</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> pats_receiving_players, <span class="fu">aes</span>(<span class="at">x =</span> player_display_name, <span class="at">y =</span> avg_yards)) <span class="sc">+</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> se_lb, <span class="at">ymax =</span> se_ub)) <span class="sc">+</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Average Yards"</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Player Name"</span>,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Average Yards per game by each Patriots player who catches passes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -261,6 +269,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>Stefon Diggs led the team in average yards per game, however it is a very even spread for the New England Patriots with no one player being overly better and leading the team by a lot. The widest standard error is also Stefon Diggs meaning he had the widest range of receiving yards. A possibility of having one or two games that may have skewed his average yards to be higher.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>QB_info <span class="ot">&lt;-</span> offensive_stats <span class="sc">|&gt;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(position <span class="sc">==</span> <span class="st">"QB"</span>) <span class="sc">|&gt;</span></span>
@@ -276,7 +285,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> se_lb, <span class="at">ymax =</span> se_ub)) <span class="sc">+</span></span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Average Yards"</span>, </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Player Name"</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Average Yards per Game by Quarterbacks in the NFL 2025 season"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -285,6 +297,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>In this graph, there is 43 different quarterbacks that all averaged over 150 yards per game in the past NFL season (2025). A few things that stand out to me is obviously the top player was Matthew Stafford, who ultimately won the MVP this year. Something that is very interesting is Jameis Winston, he has a massive standard error. This is most likely a combination of not playing a large amount of games this past season, along with him most likely having a few games with a lot of yards and a few games with a lot fewer. Other than that there is not a lot standing out, other than the fact that there are still 43 quarterbacks in this data set. Meaning some of these quarterbacks have not played a lot of games this past year as there is only 32 NFL teams.</p>
+<p>There are a few flaws in the data set. In the first graph, it has displayed the average yards per game by each position, which is what I asked and does give a decent display. A better display would be to find the average yards for each player, then group them by position and for the graph to give a total yards per game of each position. The second graph overall is good and displayed exactly what I wanted. The third graph has a few things I would wish to change, firstly, there are still to many quarterbacks (43), as there are only 32 NFL teams total. It would be a better idea to filter this by each teams main starter, meaning the quarterback who played the most games for each team this year. Secondly, the standard error bars show this some, but somehow displaying how many games each player played would be good to know to understand if their passing yards are actually a good representation.</p>
+<p>If i had more time I would definitely dive further into the quarterback data, making a more clear graphic and possibly making it possible to see where each player plays. It is a bit jumbled and there are some quarterbacks that may appear pretty good but their sample size is just really small.</p>
+<p>The standard error bars gave a better representation of the data. Making it easy to examine certain elements where certain players maybe should not be where they are. Each of these graphs display something different, while also conveying information in a simple way that any person can understand. It shows certain things that a table or easy image cannot. Such as Jameis Winston and how is standard error bars are so massive compared to the majority of the data.</p>
 
 
 
