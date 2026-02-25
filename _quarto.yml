@@ -3,14 +3,14 @@ project:
   output-dir: docs
 
 website:
-  title: "DS334_blog"
+  title: "Data Visualization"
   navbar:
     right:
       - about.qmd
       - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+        href: https://github.com/BodenDriscoll
+      - icon: linkedin
+        href: https://linkedin.com/in/boden-driscoll/
 format:
   html:
     theme: cosmo
