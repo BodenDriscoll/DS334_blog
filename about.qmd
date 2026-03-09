@@ -1,5 +1,5 @@
 ---
-title: "Data Visualization"
+title: "Boden Driscoll"
 image: stlaw.png
 about:
   template: jolla
