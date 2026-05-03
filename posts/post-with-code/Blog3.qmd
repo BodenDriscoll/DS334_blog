@@ -5,12 +5,7 @@ date: "2026-03-08"
 categories: [news, code, analysis]
 ---
 
-The data set I am working with is mtcars. A simple data set showing different variables involving car data. Within this data set there are 32 observations. The variables I have focused on are to predict average miles per gallon based on horsepower, weight of the car, and if it is a manual or automatic car. The data came directly from R and was easily read in, I believe we have used this data set briefly in a previous class. Another important piece of context is that there are not a lot of observations in this data set so the information most likely shows a good general trend but is missing a lot of cars. 
-
-
-
-
-
+The data set I am working with is mtcars. A simple data set showing different variables involving car data. Within this data set there are 32 observations. The variables I have focused on are to predict average miles per gallon based on horsepower, weight of the car, and if it is a manual or automatic car. The data came directly from R and was easily read in, I believe we have used this data set briefly in a previous class. Another important piece of context is that there are not a lot of observations in this data set so the information most likely shows a good general trend but is missing a lot of cars.
 
 ```{r}
 library(broom)
@@ -19,7 +14,6 @@ library(tidyverse)
 
 data(mtcars)
 ```
-
 
 ```{r}
 cars_mod <- lm(mpg ~ hp + wt + am, data = mtcars)
@@ -47,11 +41,7 @@ ggplot(data = pred_cars, aes(x = hp, y = predicted)) +
        caption = "Predicted MPG based on three variables, horsepower, weight in tons, and if the car is manual or automatic")
 ```
 
-
-
 In this model, the most obvious piece to see is that the manual cars tend to have higher mpg on average. Off of that, the cars who weight less also have less mpg along with as horsepower increases, mpg is also decreasing. This graph shows what we would typically expect from the data. Something that stands out is how the manual cars have a higher mpg on average. The manual cars are the one with a 1 for the interaction term
-
-
 
 ```{r}
 cars_int <- lm(mpg ~ hp + wt  + am + hp:wt, data = mtcars)
@@ -79,19 +69,8 @@ ggplot(data = pred_int, aes(x = hp, y = predicted)) +
        caption = "Predicted MPG based on three variables, horsepower, weight in tons, and if the car is manual or automatic. Along with an interaction term between horsepower and weight")
 ```
 
-This visual does a good job because it has different slopes. Determining if horsepower and weight are related based on the interaction term. The graphics are similar to the previous but it is clear that light cars mpg decreases at a much higher rate as horsepower increases. This may be because people who try to make cars fast look for light cars and increase the horsepower drastically. The trend is the same for the next two weights as well, with the heaviest car having the smallest decreasing slope as horsepower increases. 
+This visual does a good job because it has different slopes. Determining if horsepower and weight are related based on the interaction term. The graphics are similar to the previous but it is clear that light cars mpg decreases at a much higher rate as horsepower increases. This may be because people who try to make cars fast look for light cars and increase the horsepower drastically. The trend is the same for the next two weights as well, with the heaviest car having the smallest decreasing slope as horsepower increases.
 
+I think the largest flaw with the approach is that the data set I used only had 32 observations. There are far more cars that could be in the data set. If I had more time I wish there were more variables I could have used to determine if it affects the miles per gallon. Weight and horsepower are probably the two most impactful variables but what other variables may be impactful.
 
-I think the largest flaw with the approach is that the data set I used only had 32 observations. There are far more cars that could be in the data set. If I had more time I wish there were more variables I could have used to determine if it affects the miles per gallon. Weight and horsepower are probably the two most impactful variables but what other variables may be impactful. 
-
-
-The visual's I used relate to the class because we have been using regression models and that is what I have used here. Using certain variables to determine their affect on the mpg of cars. While I also faceted and used coloring to make the data set look appealling. 
-
-
-
-
-
-
-
-
- 
+The visual's I used relate to the class because we have been using regression models and that is what I have used here. Using certain variables to determine their affect on the mpg of cars. While I also faceted and used coloring to make the data set look appealling.
