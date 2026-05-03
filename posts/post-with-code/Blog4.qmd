@@ -1,0 +1,152 @@
+---
+title: "Blog4"
+format: html
+editor: visual
+---
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(readr)
+ library(stringr)
+library(fuzzyjoin)
+library(plotly)
+library(shiny)
+library(here)
+
+sports <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2022/2022-03-29/sports.csv')
+
+basketball_stat <- readr::read_csv("C:/Users/boden/OneDrive/Documents/Rstudio_334/Final_Project/data/College Basketball Dataset-2019.csv")
+
+basketball <- readr::read_csv("C:/Users/boden/OneDrive/Documents/Rstudio_334/Final_Project/data/College Basketball Dataset.csv")
+
+basketball <- basketball |> filter(YEAR %in% c("2015", "2016", "2017", "2018"))
+
+```
+
+```{r}
+basketball_2015_2019 <- bind_rows(basketball, basketball_stat) |>
+
+  mutate(YEAR = ifelse(is.na(YEAR), "2019", YEAR)) |>
+  select(TEAM, CONF, G, W, POSTSEASON, SEED, YEAR) |>
+  mutate(TEAM = TEAM |>
+  str_to_lower())
+
+
+  basketball_2015_2019$YEAR <- as.numeric(basketball_2015_2019$YEAR)
+
+basketball_2015_2019
+```
+
+```{r}
+basketball_money <- sports |> filter(sports == "Basketball") |>
+  filter(classification_code == "1")|>
+  select(year, unitid, institution_name, state_cd, classification_code, classification_name, sector_cd, sector_name, partic_men, partic_women, sum_partic_men, sum_partic_women, rev_men, rev_women, total_rev_menwomen, exp_men, exp_women, total_exp_menwomen, sports) |>
+  rename(YEAR = year) |>
+  rename(TEAM = institution_name) |>
+  mutate(TEAM = TEAM |>
+           str_to_lower() |>
+           str_replace_all("university", "") |>
+           str_replace_all("college", "") |>
+           str_replace_all("campus", "") |>
+           str_replace_all("of ", "") |>
+           str_replace_all("at ", "") |>
+           str_replace_all("main ","") |>
+           str_replace_all("station ", "") |>
+           str_replace_all("-", " ") |>
+           str_replace_all("chapel hill", "") |>
+           str_replace_all("ann arbor", "" ) |>
+           str_replace_all("madison", "") |>
+           str_replace_all("raleigh", "" ) |>
+           str_squish())
+```
+
+```{r}
+df <- stringdist_left_join(
+  basketball_2015_2019, basketball_money,
+  by = "TEAM",
+  method = "osa",           # Optimal String Alignment
+  max_dist = 1,             # Allow up to 2 changes (add, drop, swap)
+  distance_col = "str_dist"
+)
+
+df <- df |> filter(YEAR.x == YEAR.y) |>
+  rename(YEAR = YEAR.x,
+         TEAM = TEAM.x) |>
+  select(- YEAR.y,
+         - TEAM.y) |>
+  mutate(in_tournament = !is.na(POSTSEASON)) |>
+mutate(profit_men = rev_men - exp_men)
+```
+
+
+
+This project analyzes a data set of college basketball teams, focusing on the relationship between financial performance (such as revenue, expenses, and profit) and on-court success, including wins and postseason outcomes. Using interactive visualizations built in a Shiny app, the analysis allows users to explore distributions and relationships across different conferences and years. Key findings suggest that while teams with higher profits and revenues often tend to perform better and advance further in the postseason, the relationship is not perfectly linear, indicating that financial resources alone do not guarantee success. Other factors, such as team performance metrics, also play a significant role in determining postseason advancement. Some teams during this period displayed large profit numbers, with less success (Louisville). While if you find any cinderella run in March Madness, their profit margin is extremely low compared to any power 5 team.
+
+The primary questions of interest in this analysis are: How are financial variables such as revenue and profit distributed across teams and conferences? Is there a relationship between a team’s financial resources and its regular season success, measured by wins? Do teams with higher profits or revenues tend to advance further in the postseason? and how do these relationships vary across conferences and years? Through interactive visualizations, this project aims to uncover patterns and assess whether financial strength is a meaningful predictor of basketball performance, while also highlighting the limitations of such a relationship.
+
+
+```{r}
+tourney_vs_no_tourney <- df |> group_by(in_tournament)
+
+tourney_plot <- ggplot(tourney_vs_no_tourney, aes(x = YEAR, y = profit_men,  color = in_tournament,
+                                  label = TEAM)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+    scale_y_continuous(labels = scales::comma) +
+  labs(title = "Analyzing Teams in the Tournament vs not in Tournament"  ,
+       y = "profit")
+```
+
+```{r}
+ggplotly(tourney_plot, tooltip = "label")
+```
+
+
+The visual above depicts teams who made the NCAA March Madness tournament from 2015 to 2019 with profit of each team during each year. Based on the visual, there is clear correlation between teams who made the tournament versus those who did not. Teams who made the tournament were in the range of 5 million dollars profit each year. While teams who did not make the tournament were in the realm of 500,000 dollars to maybe $1.5 million.
+
+College basketball during this period of time was known for a variety of teams paying players which ultimately led to the implementation of NIL. This visual, although difficult to see individual teams gives a great insight into the idea that making more money as a basketball team, in turn, leads to a better chance of making the NCAA tournament.
+
+
+```{r}
+df <-  df |> mutate(POSTSEASON = as.numeric(factor(POSTSEASON,
+    levels = c("R68", "R64", "R32", 
+               "S16", "E8", "F4", "2ND" ,"Champions")
+  )))
+```
+
+```{r}
+finish_vs_profit <- ggplot(df, aes(x = profit_men, y = POSTSEASON, color = W,
+                                   label = TEAM)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Team Profit vs. Postseason Success",
+    x = "Profit",
+    y = "Postseason Round"
+  ) +
+    scale_color_viridis_c() +
+  scale_x_continuous(labels = scales::comma)
+```
+
+```{r}
+ggplotly(finish_vs_profit, tooltip = "label")
+```
+
+  So far, we have looked directly into postseason success based on each teams profits. While another clear indicator of postseason success is the amount of wins each team as in the regular season. We all know there is a relationship between regular season wins and the eventual finish in March Madness. As the 1 seed in the tournament, who are the 4 best regular season teams in the country have made up 18 of 25 national champions (2000-2025). This shows that teams who have more regular season wins tend to do much better in the tournament. 
+  
+  In this visual, a postseason round of 2 means that you lost in the round of 64 (the first round). There are a few teams below 2, they were in the play in games and lost during those (round of 68). With round 8 meaning you won the national championship. In this model, you can clearly see the trend of more profit equals more postseason success by getting to farther rounds. Within this, the teams with more wins in the regular season also very evident in getting farther in the postseason. It is a bit varied in the beginning, with a good amount of variation in rounds 3 or below. This shows that plenty of teams with less wins also won a round or two in the tournament. However, teams who have large success and win a lot of games all have a lot wins. Most teams getting to the elite 8 have over 30 wins on the season. Syracuse is one outlier here, winning in the range of 25 regular season games, while making it all the way to the final 4. 
+  
+  This visual does a good job showing a different view from just direct profit versus postseason success. Although there is definitely evidence of this. Regular season wins have a huge effect as well. There have been only 5 teams in the 21st century to win the tournament as 3 seed or lower. Three of those being three seeds, one four seed, and one seven seed. To win March Madness, the overwhelming majority says that you must be high seed to achieve great success in the tournament. 
+  
+  In conclusion, this project provides a useful visual exploration of how financial performance and on-court success are related in college basketball, but it also highlights several areas for improvement. One limitation of the current visualizations is that they focus primarily on a few variables at a time, which may oversimplify the complexity of team success. Factors such as strength of schedule, player talent, injuries, and coaching quality are not included in the dataset but play a major role in real-world outcomes. Additionally, while the interactive plots allow for exploration across conferences and years, they do not formally quantify relationships, meaning patterns observed in the graphs should be interpreted cautiously rather than as definitive conclusions.
+
+
+
+
+
+
+
+
+
+
